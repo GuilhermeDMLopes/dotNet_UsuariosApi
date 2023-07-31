@@ -33,7 +33,9 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 //AddScoped - CadastroService sempre vai ser instanciado quando houver uma requisição nova que demande uma instancia do CadastroService
 //AddTransient - Sempre vai criar uma instancia nova de CadastroService, mesmo que seja na mesma requisição
 //AddSingleton - Uma unica instancia de CadastroService para todas as requisições que chegassem
-builder.Services.AddScoped<CadastroService>();
+builder.Services.AddScoped<UsuarioService>();
+//Adicionando Service de Token
+builder.Services.AddScoped<TokenService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
