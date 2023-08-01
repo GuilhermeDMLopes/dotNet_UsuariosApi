@@ -9,6 +9,14 @@ namespace UsuariosApi.Services
 {
     public class TokenService
     {
+        private IConfiguration _configuration;
+
+        //Criando construtor para usar secrets
+        public TokenService(IConfiguration configuration)
+        {
+            //inicializando a configuração
+            _configuration = configuration;            
+        }
         public string GenerateToken(Usuario usuario)
         {
             //Informações que serão usadas para gerar o token do usuario
@@ -20,7 +28,7 @@ namespace UsuariosApi.Services
             };
 
             //Criando palavra chave para geração do nosso token
-            var chave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SA99123KAJSD1Las1"));
+            var chave = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["SymmetricSecurityKey"]));
 
             //Criando credenciais. Chave secreta e algoritmo de encriptografia
             var signingCredentials = new SigningCredentials(chave, SecurityAlgorithms.HmacSha256);

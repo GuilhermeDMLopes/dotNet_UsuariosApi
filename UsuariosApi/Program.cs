@@ -11,7 +11,8 @@ using UsuariosApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 //Variavel de conexão com banco
-var connectionString = builder.Configuration.GetConnectionString("UsuarioConnection");
+//Usando secrets para proteger a connectionString
+var connectionString = builder.Configuration["ConnectionStrings:UsuarioConnection"];
 
 // Add services to the container.
 //Adicionando o contexto que vamos nos comunicar com o banco
@@ -61,7 +62,8 @@ builder.Services.AddAuthentication(options =>
     {
         //Validando a chave
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SA99123KAJSD1Las1")),
+        //Utilizando secrets para proteger a chave
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["SymmetricSecurityKey"])),
         //Validando ataques de redirecionamento, não permitindo
         ValidateAudience = false,
         ValidateIssuer = false,
