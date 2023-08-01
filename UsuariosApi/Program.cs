@@ -1,5 +1,10 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using UsuariosApi.Authorization;
 using UsuariosApi.Data;
 using UsuariosApi.Models;
 using UsuariosApi.Services;
@@ -37,10 +42,38 @@ builder.Services.AddScoped<UsuarioService>();
 //Adicionando Service de Token
 builder.Services.AddScoped<TokenService>();
 
+//Adicionando Authorizations
+builder.Services.AddSingleton<IAuthorizationHandler, IdadeAuthorization>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Adicionando autenticação
+builder.Services.AddAuthentication(options =>
+{
+    //Definindo autenticação padrão
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        //Validando a chave
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SA99123KAJSD1Las1")),
+        //Validando ataques de redirecionamento, não permitindo
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+//Definido policy a ser usada e sua logica
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IdadeMinima", policy => policy.AddRequirements(new IdadeMinima(18)));
+});
 
 var app = builder.Build();
 
@@ -52,6 +85,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//Dizendo que nossa aplicação usa autenticação para que funcione bem
+app.UseAuthentication();
 
 app.UseAuthorization();
 
